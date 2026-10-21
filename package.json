@@ -1,0 +1,23 @@
+{
+  "name": "fullstack-tech-guide",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "StackAtlas — 全端技術中英名詞知識庫與架站選型指南",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "vite": "^8.3.5"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}

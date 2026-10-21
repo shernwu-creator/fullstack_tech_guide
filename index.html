@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta
+      name="description"
+      content="StackAtlas 全端技術知識庫：以白話解析前端、後端、資料庫與 DevOps 中英名詞，並依網站型態提供可落地的技術選型與成本評估。"
+    />
+    <meta name="theme-color" content="#080d0c" />
+    <meta property="og:title" content="StackAtlas — 全端技術知識庫" />
+    <meta
+      property="og:description"
+      content="把全端技術讀成一張地圖：50 個中英名詞解析 × 4 種網站型態的技術選型指南。"
+    />
+    <meta property="og:type" content="website" />
+    <title>StackAtlas — 全端技術知識庫｜中英名詞解析與選型指南</title>
+    <script>
+      // Apply the saved/system theme before first paint to avoid a flash.
+      (() => {
+        const key = 'stackatlas-theme'
+        let theme = null
+        try {
+          theme = localStorage.getItem(key)
+        } catch {
+          /* storage can be unavailable in private contexts */
+        }
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = window.matchMedia('(prefers-color-scheme: light)').matches
+            ? 'light'
+            : 'dark'
+        }
+        document.documentElement.dataset.theme = theme
+        document
+          .querySelector('meta[name="theme-color"]')
+          ?.setAttribute('content', theme === 'light' ? '#f4f6f0' : '#080d0c')
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
