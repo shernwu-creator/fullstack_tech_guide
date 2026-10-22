@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Relative base keeps the built site portable on static hosts and sub-paths.
+// GitHub Pages project sites are served from /<repository-name>/.
 export default defineConfig({
-  base: './',
+  base: '/fullstack_tech_guide/',
   plugins: [react()],
   build: {
     target: 'es2022',

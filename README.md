@@ -19,17 +19,26 @@
 
 ```bash
 pnpm install
-pnpm dev        # http://localhost:5173
+pnpm dev        # http://localhost:5173/fullstack_tech_guide/
 pnpm build      # 產出 dist/
 pnpm preview    # 預覽 production build
 ```
+
+## 部署
+
+推送到 `main` 分支會觸發 GitHub Actions（`.github/workflows/deploy.yml`），完成建置後自動部署到 GitHub Pages：
+
+<https://shernwu-creator.github.io/fullstack_tech_guide/>
 
 ## 專案結構
 
 ```text
 fullstack_tech_guide/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml            # GitHub Pages 自動部署
 ├── index.html                    # 入口、SEO meta、主題預先載入 script
-├── vite.config.js                # Vite + React plugin（相對 base，利於靜態部署）
+├── vite.config.js                # Vite + React plugin（/fullstack_tech_guide/ base）
 ├── package.json
 ├── pnpm-lock.yaml
 ├── public/
