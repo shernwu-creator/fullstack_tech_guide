@@ -280,3 +280,72 @@ export function getHighlightParts(text, query) {
 
   return parts.length ? parts : [{ text: source, match: false }]
 }
+
+/**
+ * 開發工具搜尋：名稱、分類、關鍵字與簡介皆可命中。
+ * @param {Array} tools 工具資料
+ * @param {string} query 使用者輸入
+ * @param {Array} categories 工具分類 meta（用於把分類名稱納入搜尋）
+ */
+export function searchTools(tools, query, categories = []) {
+  const trimmed = query.trim()
+  if (!trimmed) return tools
+
+  const tokens = trimmed
+    .split(/\s+/)
+    .map(normalizeChars)
+    .filter(Boolean)
+
+  if (!tokens.length) return tools
+
+  const categoryLookup = new Map(categories.map((category) => [category.id, category]))
+  const entries = tools.map((tool) => {
+    const category = categoryLookup.get(tool.category)
+    const title = normalizeChars([tool.name, tool.en].join(' '))
+    return {
+      tool,
+      title,
+      aliases: normalizeChars(
+        [...(tool.keywords ?? []), category?.label, category?.en].join(' '),
+      ),
+      body: normalizeChars(
+        [tool.summary, tool.plain, tool.practice, ...(tool.useCases ?? [])].join(' '),
+      ),
+    }
+  })
+
+  const score = (entry) => {
+    let total = 0
+    for (const token of tokens) {
+      let value = 0
+      if (entry.title === token) value = 130
+      else if (entry.title.startsWith(token)) value = 100
+      else if (entry.title.includes(token)) value = 80
+      else if (entry.aliases.includes(token)) value = 48
+      else if (entry.body.includes(token)) value = 18
+      if (!value) return -1
+      total += value + Math.min(token.length, 12) * 2
+    }
+    return total
+  }
+
+  const directMatches = entries
+    .map((entry) => ({ entry, score: score(entry) }))
+    .filter((item) => item.score >= 0)
+
+  if (directMatches.length) {
+    return directMatches
+      .sort((a, b) => b.score - a.score)
+      .map((item) => item.entry.tool)
+  }
+
+  return entries
+    .filter((entry) =>
+      tokens.every((token) => {
+        const isCjk = /[\u4e00-\u9fff]/.test(token)
+        if ((isCjk && token.length < 2) || (!isCjk && token.length < 3)) return false
+        return isSubsequence(entry.title, token)
+      }),
+    )
+    .map((entry) => entry.tool)
+}

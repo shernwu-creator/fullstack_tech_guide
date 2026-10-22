@@ -1,5 +1,6 @@
 import { GLOSSARY } from '../data/glossaryData'
 import { STACK_GUIDES } from '../data/stackMatrixData'
+import { TOOLS } from '../data/toolkitData'
 
 export function Footer({ onBackToTop }) {
   return (
@@ -12,8 +13,8 @@ export function Footer({ onBackToTop }) {
           <div>
             <strong>StackAtlas</strong>
             <p>
-              以官方文件為錨點的全端知識庫。收錄 {GLOSSARY.length} 個名詞與 {STACK_GUIDES.length}{' '}
-              套選型藍圖；技術版本迭代快速，實作前請以最新官方文件為準。
+              以官方文件為錨點的全端知識庫。收錄 {GLOSSARY.length} 個名詞、{TOOLS.length} 個開發工具與{' '}
+              {STACK_GUIDES.length} 套選型藍圖；技術版本迭代快速，實作前請以最新官方文件為準。
             </p>
           </div>
         </div>

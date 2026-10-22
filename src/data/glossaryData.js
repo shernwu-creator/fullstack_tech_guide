@@ -17,6 +17,7 @@ export const CATEGORIES = [
   { id: 'backend', label: '後端', en: 'Backend & API' },
   { id: 'database', label: '資料庫', en: 'Database' },
   { id: 'devops', label: 'DevOps', en: 'DevOps & Delivery' },
+  { id: 'tools', label: '開發工具', en: 'Dev Toolkit' },
   { id: 'guide', label: '架站選型指南', en: 'Tech Stack Guide' },
 ]
 

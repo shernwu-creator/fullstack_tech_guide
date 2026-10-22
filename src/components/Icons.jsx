@@ -97,3 +97,10 @@ export const AlertIcon = ({ size = 15, ...props }) => (
     <path d="M12 9v4.5M12 17h.01" />
   </svg>
 )
+
+export const GlobeIcon = ({ size = 14, ...props }) => (
+  <svg {...baseProps} width={size} height={size} {...props}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M3 12h18M12 3c2.4 2.5 3.6 5.5 3.6 9s-1.2 6.5-3.6 9c-2.4-2.5-3.6-5.5-3.6-9S9.6 5.5 12 3Z" />
+  </svg>
+)

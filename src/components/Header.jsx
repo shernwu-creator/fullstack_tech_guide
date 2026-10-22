@@ -1,6 +1,6 @@
 import { CloseIcon, MoonIcon, SearchIcon, SunIcon } from './Icons'
 
-export function Header({ query, onQueryChange, theme, onToggleTheme, searchRef }) {
+export function Header({ query, onQueryChange, theme, onToggleTheme, searchRef, placeholder }) {
   const nextTheme = theme === 'dark' ? 'light' : 'dark'
 
   return (
@@ -34,8 +34,8 @@ export function Header({ query, onQueryChange, theme, onToggleTheme, searchRef }
                 event.currentTarget.blur()
               }
             }}
-            placeholder="搜尋名詞或技術，例如 SSR、微服務、Redis…"
-            aria-label="搜尋全端技術名詞，支援中英文與簡繁模糊搜尋"
+            placeholder={placeholder}
+            aria-label="搜尋全端技術名詞或開發工具，支援中英文與簡繁模糊搜尋"
             autoComplete="off"
             autoCapitalize="off"
             spellCheck="false"

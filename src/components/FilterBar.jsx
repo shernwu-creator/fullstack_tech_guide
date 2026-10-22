@@ -1,9 +1,11 @@
 import { CATEGORIES, GLOSSARY_COUNTS } from '../data/glossaryData'
 import { STACK_GUIDES } from '../data/stackMatrixData'
+import { TOOLS } from '../data/toolkitData'
 
 export function FilterBar({ activeCategory, onSelectCategory }) {
   const counts = {
     ...GLOSSARY_COUNTS,
+    tools: TOOLS.length,
     guide: STACK_GUIDES.length,
   }
 

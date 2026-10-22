@@ -1,5 +1,6 @@
 import { CATEGORY_META, GLOSSARY_COUNTS, GLOSSARY } from '../data/glossaryData'
 import { STACK_GUIDES } from '../data/stackMatrixData'
+import { TOOLS } from '../data/toolkitData'
 import { ArrowDownIcon, ArrowRightIcon, ArrowUpRightIcon } from './Icons'
 
 const MAP_CATEGORIES = ['frontend', 'backend', 'database', 'devops']
@@ -19,7 +20,7 @@ export function Hero({ activeCategory, onSelectCategory, onExplore, onExploreGui
         </h1>
         <p className="hero-lead">
           從 SPA、GraphQL 到 Kubernetes，用 {GLOSSARY.length} 個中英對照名詞建立共同語言；
-          再用四種真實網站型態，把技術選擇放回成本、維護與團隊的脈絡裡。
+          再從 {TOOLS.length} 個開發工具與四種真實網站型態，把技術選擇放回成本、維護與團隊的脈絡裡。
         </p>
         <div className="hero-actions">
           <button type="button" className="button button-primary" onClick={onExplore}>
@@ -33,7 +34,7 @@ export function Hero({ activeCategory, onSelectCategory, onExplore, onExploreGui
         </div>
         <div className="hero-meta" aria-label="知識庫統計">
           <span>{GLOSSARY.length} terms</span>
-          <span>{MAP_CATEGORIES.length} domains</span>
+          <span>{TOOLS.length} tools</span>
           <span>{STACK_GUIDES.length} blueprints</span>
           <span>中英對照</span>
         </div>
@@ -72,10 +73,26 @@ export function Hero({ activeCategory, onSelectCategory, onExplore, onExploreGui
 
         <button
           type="button"
+          className={`map-row map-tools${activeCategory === 'tools' ? ' is-active' : ''}`}
+          onClick={() => onSelectCategory('tools')}
+        >
+          <span className="map-index">05</span>
+          <span className="map-label">
+            <strong>開發工具</strong>
+            <small>Dev Toolkit</small>
+          </span>
+          <span className="map-count">
+            {String(TOOLS.length).padStart(2, '0')}
+            <ArrowUpRightIcon size={13} />
+          </span>
+        </button>
+
+        <button
+          type="button"
           className={`map-row map-guide${activeCategory === 'guide' ? ' is-active' : ''}`}
           onClick={() => onSelectCategory('guide')}
         >
-          <span className="map-index">05</span>
+          <span className="map-index">06</span>
           <span className="map-label">
             <strong>架站選型指南</strong>
             <small>Tech Stack Guide</small>
@@ -86,7 +103,7 @@ export function Hero({ activeCategory, onSelectCategory, onExplore, onExploreGui
           </span>
         </button>
 
-        <p className="map-foot">從名詞理解原理，再從情境做選擇。</p>
+        <p className="map-foot">從名詞理解原理，再挑選工具、做出選擇。</p>
       </aside>
     </section>
   )

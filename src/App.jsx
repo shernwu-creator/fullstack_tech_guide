@@ -7,14 +7,16 @@ import { GuideCTA } from './components/GuideCTA'
 import { GuideLibrary } from './components/GuideLibrary'
 import { Header } from './components/Header'
 import { Hero } from './components/Hero'
+import { ToolkitLibrary } from './components/ToolkitLibrary'
 import {
   CATEGORY_META,
   GLOSSARY,
 } from './data/glossaryData'
 import { STACK_GUIDES } from './data/stackMatrixData'
+import { TOOL_CATEGORIES, TOOL_CATEGORY_META, TOOLS } from './data/toolkitData'
 import { useTheme } from './hooks/useTheme'
 import { padNumber } from './utils/format'
-import { searchGlossary, searchGuides } from './utils/search'
+import { searchGlossary, searchGuides, searchTools } from './utils/search'
 
 const CATEGORY_ORDER = ['frontend', 'backend', 'database', 'devops']
 
@@ -28,10 +30,20 @@ const SUGGESTIONS = {
 
 const GUIDE_SUGGESTIONS = ['Next.js', 'PostgreSQL', 'Supabase', 'Astro']
 
+const TOOL_SUGGESTIONS = {
+  all: ['Cursor', 'Supabase', 'Playwright', 'Mermaid', 'Vercel'],
+  'ai-assistants': ['Cursor', 'Windsurf', 'Copilot'],
+  'baas-api': ['Supabase', 'Firebase', 'Bruno'],
+  testing: ['Vitest', 'Playwright', 'Cypress'],
+  diagramming: ['Mermaid', 'Excalidraw'],
+  deployment: ['Vercel', 'GitHub Actions', 'Docker'],
+}
+
 export default function App() {
   const { theme, toggleTheme } = useTheme()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
+  const [activeToolCategory, setActiveToolCategory] = useState('all')
   const deferredQuery = useDeferredValue(query)
   const searchRef = useRef(null)
   const libraryRef = useRef(null)
@@ -40,7 +52,13 @@ export default function App() {
   const isSearching = cleanQuery.length > 0
   const isStale = query !== deferredQuery
   const isGuideView = category === 'guide'
-  const categoryMeta = category !== 'all' && category !== 'guide' ? CATEGORY_META[category] : null
+  const isToolkitView = category === 'tools'
+  const toolCategoryMeta =
+    activeToolCategory === 'all' ? null : TOOL_CATEGORY_META[activeToolCategory]
+  const categoryMeta =
+    category !== 'all' && category !== 'guide' && category !== 'tools'
+      ? CATEGORY_META[category]
+      : null
 
   const glossaryScope = useMemo(
     () =>
@@ -58,6 +76,19 @@ export default function App() {
   const filteredGuides = useMemo(
     () => searchGuides(STACK_GUIDES, deferredQuery),
     [deferredQuery],
+  )
+
+  const toolScope = useMemo(
+    () =>
+      activeToolCategory === 'all'
+        ? TOOLS
+        : TOOLS.filter((tool) => tool.category === activeToolCategory),
+    [activeToolCategory],
+  )
+
+  const filteredTools = useMemo(
+    () => searchTools(toolScope, deferredQuery, TOOL_CATEGORIES),
+    [toolScope, deferredQuery],
   )
 
   const groupedGlossary = useMemo(
@@ -83,6 +114,9 @@ export default function App() {
   const selectCategory = useCallback(
     (nextCategory, { scroll = false } = {}) => {
       setCategory(nextCategory)
+      if (nextCategory === 'tools') {
+        setActiveToolCategory('all')
+      }
       if (scroll) {
         window.requestAnimationFrame(() => {
           window.requestAnimationFrame(scrollToLibrary)
@@ -107,6 +141,10 @@ export default function App() {
     [selectCategory],
   )
 
+  const handleSelectToolCategory = useCallback((nextCategory) => {
+    setActiveToolCategory(nextCategory)
+  }, [])
+
   const handleSuggestion = useCallback((suggestion) => {
     setQuery(suggestion)
     window.requestAnimationFrame(() => searchRef.current?.focus())
@@ -120,6 +158,7 @@ export default function App() {
   const handleReset = useCallback(() => {
     setQuery('')
     setCategory('all')
+    setActiveToolCategory('all')
   }, [])
 
   const handleBackToTop = useCallback(() => {
@@ -151,37 +190,63 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
-  const resultCount = isGuideView ? filteredGuides.length : filteredGlossary.length
+  const resultCount = isToolkitView
+    ? filteredTools.length
+    : isGuideView
+      ? filteredGuides.length
+      : filteredGlossary.length
 
   const heading = isSearching
-    ? isGuideView
-      ? '指南搜尋結果'
-      : '名詞搜尋結果'
-    : isGuideView
-      ? '四種網站，四種取捨。'
-      : category === 'all'
-        ? '全端名詞地圖'
-        : `${categoryMeta.label}技術名詞`
+    ? isToolkitView
+      ? '工具搜尋結果'
+      : isGuideView
+        ? '指南搜尋結果'
+        : '名詞搜尋結果'
+    : isToolkitView
+      ? toolCategoryMeta?.label ?? '開發工具目錄'
+      : isGuideView
+        ? '四種網站，四種取捨。'
+        : category === 'all'
+          ? '全端名詞地圖'
+          : `${categoryMeta.label}技術名詞`
 
   const description = isSearching
-    ? isGuideView
-      ? `在四種網站型態中尋找「${cleanQuery}」，涵蓋技術組合、選型理由與成本評估。`
-      : `在${category === 'all' ? '全端名詞庫' : `${categoryMeta.label}名詞`}中尋找「${cleanQuery}」；中英文、縮寫與簡繁輸入皆可。`
-    : isGuideView
-      ? '依網站型態整理推薦組合、選型理由與成本／維護評估。沒有最好的技術，只有最適合當下團隊的取捨。'
-      : category === 'all'
-        ? '從渲染策略、API 設計到資料層與部署，把分散的技術名詞放回同一個脈絡。支援中英文、縮寫與簡繁模糊搜尋。'
-        : `${categoryMeta.description} 共 ${filteredGlossary.length} 個名詞，點開官方文件可繼續延伸閱讀。`
+    ? isToolkitView
+      ? `在${activeToolCategory === 'all' ? '開發工具目錄' : toolCategoryMeta.label}中尋找「${cleanQuery}」；工具名稱、分類與簡介皆可比對。`
+      : isGuideView
+        ? `在四種網站型態中尋找「${cleanQuery}」，涵蓋技術組合、選型理由與成本評估。`
+        : `在${category === 'all' ? '全端名詞庫' : `${categoryMeta.label}名詞`}中尋找「${cleanQuery}」；中英文、縮寫與簡繁輸入皆可。`
+    : isToolkitView
+      ? toolCategoryMeta
+        ? `${toolCategoryMeta.description} 共 ${filteredTools.length} 個工具；所有連結均開新視窗。`
+        : '把 AI 輔助、BaaS、測試、架構視覺化與部署工具分成五類，沿用同一套卡片與色票；可從工具目錄快速切換分類。'
+      : isGuideView
+        ? '依網站型態整理推薦組合、選型理由與成本／維護評估。沒有最好的技術，只有最適合當下團隊的取捨。'
+        : category === 'all'
+          ? '從渲染策略、API 設計到資料層與部署，把分散的技術名詞放回同一個脈絡。支援中英文、縮寫與簡繁模糊搜尋。'
+          : `${categoryMeta.description} 共 ${filteredGlossary.length} 個名詞，點開官方文件可繼續延伸閱讀。`
 
   const kicker = isSearching
-    ? isGuideView
-      ? 'Stack guide / search'
-      : 'Glossary / search'
+    ? isToolkitView
+      ? 'Toolkit / search'
+      : isGuideView
+        ? 'Stack guide / search'
+        : 'Glossary / search'
+    : isToolkitView
+      ? toolCategoryMeta
+        ? `Toolkit / 05.${toolCategoryMeta.index}`
+        : 'Toolkit / 05'
+      : isGuideView
+        ? 'Stack guide / 06'
+        : category === 'all'
+          ? 'Glossary / 01—04'
+          : `Glossary / ${categoryMeta.index}`
+
+  const searchPlaceholder = isToolkitView
+    ? '搜尋工具名稱或分類，例如 Cursor、測試、Vercel…'
     : isGuideView
-      ? 'Stack guide / 05'
-      : category === 'all'
-        ? 'Glossary / 01—04'
-        : `Glossary / ${categoryMeta.index}`
+      ? '搜尋網站型態或技術，例如 SEO、電商、SaaS…'
+      : '搜尋名詞或技術，例如 SSR、微服務、Redis…'
 
   return (
     <div className="app">
@@ -196,6 +261,7 @@ export default function App() {
         theme={theme}
         onToggleTheme={toggleTheme}
         searchRef={searchRef}
+        placeholder={searchPlaceholder}
       />
 
       <main id="main">
@@ -224,7 +290,13 @@ export default function App() {
             <div className="result-meta" role="status" aria-live="polite">
               <span className="result-number">{padNumber(resultCount)}</span>
               <span className="result-label">
-                {isSearching ? 'matches' : isGuideView ? 'blueprints' : 'terms'}
+                {isSearching
+                  ? 'matches'
+                  : isGuideView
+                    ? 'blueprints'
+                    : isToolkitView
+                      ? 'tools'
+                      : 'terms'}
               </span>
               {isSearching && <span className="result-query">「{cleanQuery}」</span>}
             </div>
@@ -243,6 +315,23 @@ export default function App() {
                 onReset={handleReset}
               />
             )
+          ) : isToolkitView ? (
+            <ToolkitLibrary
+              tools={filteredTools}
+              activeCategory={activeToolCategory}
+              onSelectToolCategory={handleSelectToolCategory}
+              query={cleanQuery}
+              emptyState={
+                <EmptyState
+                  query={cleanQuery}
+                  variant="tool"
+                  suggestions={TOOL_SUGGESTIONS[activeToolCategory] ?? TOOL_SUGGESTIONS.all}
+                  onSelectSuggestion={handleSuggestion}
+                  onClear={handleClear}
+                  onReset={handleReset}
+                />
+              }
+            />
           ) : filteredGlossary.length === 0 ? (
             <EmptyState
               query={cleanQuery}
